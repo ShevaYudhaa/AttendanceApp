@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
   },
 
   orange: {
-    width: 220,
+    width: 225,
     height: 160,
     backgroundColor: 'orange'
   }
