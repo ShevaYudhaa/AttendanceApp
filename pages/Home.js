@@ -1,6 +1,6 @@
-import { View , Text , SafeAreaView , StyleSheet, TouchableOpacity , ScrollView , FlatList, Alert } from 'react-native';
+import { View , Text , SafeAreaView , StyleSheet, TouchableOpacity , ScrollView , FlatList, Alert, TextInput } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef  } from 'react';
 
 // Data Awal
 const initialHistory = [
@@ -20,9 +20,16 @@ const Home = () => {
     const [historyData, setHistoryData] = useState(initialHistory);
     const [isCheckedIn, setIsCheckedIn] = useState(false);
     const [currentTime, setCurrentTime] = useState('Memuat Jam...');
-    const [totalClass, setTotalClass] = useState(0);
-    const [presentCount, setPresentCount] = useState(0);
-    const [absentCount, setAbsentCount] = useState(0);
+    const [note, setNote] = useState('');
+    const noteInputRef = useRef(null);
+
+    const attendanceStats = useMemo(() => {
+        console.log("Menghitung ulang statistik kehadiran...");
+        const presentCount = historyData.filter(item => item.status === 'Present').length;
+        const absentCount = historyData.filter(item => item.status === 'Absent').length;
+
+        return { totalPresent: presentCount, totalAbsent: absentCount };
+    }, [historyData]);
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -39,12 +46,19 @@ const Home = () => {
             return;
         }
 
+        if (note.trim() === '') {
+            Alert.alert('Perhatian !', 'Silakan tambahkan catatan sebelum check-in.');
+            noteInputRef.current?.focus();
+            return;
+        }
+
         const newAttendance = {
             id: Date.now().toString(),
             course: 'Mobile Programming',
             date: new Date().toLocaleDateString('id-ID'),
             status: 'Present',
         };
+
         setHistoryData([newAttendance, ...historyData]);
         setIsCheckedIn(true);
         Alert.alert('Sukses', `Berhasil Check-in pada pukul ${currentTime}!`);
@@ -96,6 +110,16 @@ const Home = () => {
                         <Text>08:00 - 10:00</Text>
                         <Text>Lab 3</Text>
 
+                        {!isCheckedIn && (
+                            <TextInput
+                                ref={noteInputRef}
+                                style={styles.inputCatatan}
+                                placeholder="Tulis catatan (cth: Hadir Lab)"
+                                value={note}
+                                onChangeText={setNote}
+                            />
+                        )}
+
                         <TouchableOpacity 
                             style={[styles.button, isCheckedIn ? styles.buttonDisabled : styles.buttonActive]}
                             onPress={handleCheckIn}
@@ -106,6 +130,17 @@ const Home = () => {
                                 {isCheckedIn ? 'CHECKED IN' : 'CHECK IN'}
                             </Text>
                         </TouchableOpacity>
+                </View>
+
+                <View style={styles.statsCard}>
+                    <View style={styles.statBox}>
+                        <Text style={styles.statNumber}>{attendanceStats.totalPresent}</Text>
+                        <Text style={styles.statLabel}>Total Present</Text>
+                    </View>
+                    <View style={styles.statBox}>
+                        <Text style={[styles.statNumber, { color: 'red' }]  }>{attendanceStats.totalAbsent}</Text>
+                        <Text style={styles.statLabel}>Total Absent</Text>
+                    </View>
                 </View>
 
                 <View style={styles.classcard}>
@@ -232,5 +267,33 @@ const styles = StyleSheet.create({
     },
     buttonDisabled: {
         backgroundColor: '#d5e0f3',
+    },
+    inputCatatan: {
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 8,
+        padding: 10,
+        marginTop: 15,
+        backgroundColor: '#fafafa',
+    },
+    statsCard: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        backgroundColor: "white",
+        padding: 15,
+        borderRadius: 10,
+        marginBottom: 20,
+    },
+    statBox: {
+        alignItems: 'center',
+    },
+    statNumber: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: 'green',
+    },
+    statLabel: {
+        fontSize: 14,
+        color: 'gray',
     },
 });
