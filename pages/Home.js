@@ -47,7 +47,7 @@ const Home = () => {
         }
 
         if (note.trim() === '') {
-            Alert.alert('Perhatian !', 'Silakan tambahkan catatan sebelum check-in.');
+            Alert.alert('Perhatian', 'Silakan tambahkan catatan sebelum check-in.');
             noteInputRef.current?.focus();
             return;
         }
@@ -90,6 +90,7 @@ const Home = () => {
             <ScrollView contentContainerStyle={styles.content}>
                 <View style={styles.headerRow}>
                     <Text style={styles.tittle}>Attendance App</Text>
+                    <Text style={styles.clockText}>{currentTime}</Text>
                 </View>
 
                 <View style={styles.card}>
