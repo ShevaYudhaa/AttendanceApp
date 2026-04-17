@@ -1,13 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
+  SafeAreaView,
   StyleSheet,
   FlatList,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 const initialHistory = [
   {
@@ -29,10 +30,62 @@ const initialHistory = [
 ];
 
 export default function HistoryScreen({ navigation }) {
-  const [historyData] = useState(initialHistory);
+  //const [historyData] = useState(initialHistory);
 
-  const renderItem = ({ item }) => (
-    // SIHIR NAVIGASI: Pindah layar sambil melempar parameter 'item'
+  // 1. STATE UNTUK DATA & CONTROL
+  const [historyData, setHistoryData] = useState([]); // Mulai dari array kosong
+  const [isLoading, setIsLoading] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [page, setPage] = useState(1); // Melacak halaman ke berapa yang di refresh
+
+  // 2. FUNCTION UNTUK FETCH DATA
+  const fetchAttendanceData = (isInitial = false) => {
+    if (isLoading) return; // Cegah multiple request
+
+    setIsLoading(true);
+
+    // Simulasi delay jaringan 1.5 detik
+    setTimeout(() => {
+      const newItems = [];
+      const startIdx = isInitial ? 0 : historyData.length;
+
+      for (let i = 1; i <= 10; i++) {
+        newItems.push({
+          id: (startIdx + i).toString(),
+          course: `Mata Kuliah #${startIdx + i}`,
+          date: "2026-04-14",
+          status: i % 3 === 0 ? "Absent" : "Present",
+          room: "Lab 3",
+          lecturer: "Dosen Pengampu",
+        });
+      }
+
+      // Jika initial (halaman 1), ganti data. Jika tidak, gabungkan (append)
+      setHistoryData(isInitial ? newItems : [...historyData, ...newItems]);
+      setIsLoading(false);
+      setIsRefreshing(false);
+    }, 1500);
+  };
+
+  // Panggil saat layar pertama kali dibuka
+  useEffect(() => {
+    fetchAttendanceData(true);
+  }, []);
+
+  // 3. Function Refresh (Pull to Refresh)
+  const onRefresh = () => {
+    setIsRefreshing(true);
+    fetchAttendanceData(true); // Reset ke data paling awal
+  };
+
+  const handleLoadMore = () => {
+    // Hanya muat data baru jika data sekarang sudah cukup banyak
+    if (historyData.length >= 10 && !isLoading) {
+      fetchAttendanceData(false);
+    }
+  };
+
+    const renderItem = ({ item }) => (
     <TouchableOpacity
       style={styles.item}
       onPress={() => navigation.navigate("Detail", { dataPresensi: item })}
@@ -53,6 +106,17 @@ export default function HistoryScreen({ navigation }) {
     </TouchableOpacity>
   );
 
+  const renderFooter = () => {
+    if (!isLoading) return null;
+    return (
+      <View style={styles.footerLoader}>
+        <ActivityIndicator size="small" color="#0056A0" />
+        <Text style={styles.loaderText}>Memuat riwayat lama...</Text>
+      </View>
+    );
+
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <FlatList
@@ -60,6 +124,20 @@ export default function HistoryScreen({ navigation }) {
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.content}
+        // New Fitur
+        refreshing={isRefreshing}
+        onRefresh={() => {
+          setIsRefreshing(true);
+          fetchAttendanceData(true);
+        }}
+        onEndReached={() => {
+          if (historyData.length >= 10) fetchAttendanceData(false);
+        }}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={renderFooter}
+        ListEmptyComponent={
+          !isLoading && <Text style={styles.emptyText}>Tidak ada riwayat.</Text>
+        }
       />
     </SafeAreaView>
   );
@@ -81,4 +159,12 @@ const styles = StyleSheet.create({
   date: { fontSize: 12, color: "gray", marginTop: 4 },
   present: { color: "green", fontWeight: "bold" },
   absent: { color: "red", fontWeight: "bold" },
+  footerLoader: {
+    paddingVertical: 20,
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "center",
+  },
+  loaderText: { marginLeft: 10, color: "#666", fontSize: 12 },
+  emptyText: { textAlign: "center", marginTop: 50, color: "#999" },
 });
