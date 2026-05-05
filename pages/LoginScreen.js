@@ -1,33 +1,51 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, Button } from "react-native";
+import React, { useState, useContext } from "react";
+import { View, TextInput, Button, Alert } from "react-native";
+import axios from "axios";
+import { AuthContext } from "../context/AuthContext";
 
-export default function LoginScreen({ navigation }) {
-  const [username, setUsername] = useState("");
+const BASE_URL = "http://10.1.13.46:8080/api/user";
+
+export default function LoginScreen() {
+  const { login } = useContext(AuthContext);
+
+  const [nim, setNim] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
-    if (username === "astratech" && password === "123") {
-      navigation.replace("Home");
-    } else {
-      alert("Username atau Password salah");
+  const handleLogin = async () => {
+    try {
+      const res = await axios.post(
+        BASE_URL + "/login",
+        { nim, password },
+        {
+          headers: {
+            authcode: "astratech@123",
+          },
+        },
+      );
+
+      if (res.data.code === 200 && res.data.data) {
+        login(res.data.data);
+      } else {
+        Alert.alert("Login Gagal", res.data.message);
+      }
+    } catch (err) {
+      Alert.alert("Error", "Tidak bisa konek ke server");
     }
   };
-
   return (
     <View style={{ padding: 20 }}>
-      <Text style={{ fontSize: 20, marginBottom: 10 }}>Login</Text>
       <TextInput
-        placeholder="Username"
-        value={username}
-        onChangeText={setUsername}
-        style={{ borderWidth: 1, marginBottom: 10, padding: 8 }}
+        placeholder="NIM"
+        value={nim}
+        onChangeText={setNim}
+        style={{ borderWidth: 1, marginBottom: 10 }}
       />
       <TextInput
         placeholder="Password"
         value={password}
-        onChangeText={setPassword}
         secureTextEntry
-        style={{ borderWidth: 1, marginBottom: 20, padding: 8 }}
+        onChangeText={setPassword}
+        style={{ borderWidth: 1, marginBottom: 10 }}
       />
       <Button title="Login" onPress={handleLogin} />
     </View>
