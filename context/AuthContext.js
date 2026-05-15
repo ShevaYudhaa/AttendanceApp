@@ -18,8 +18,18 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (data) => {
     if (!data) return;
-    setUserData(data);
-    await AsyncStorage.setItem("userData", JSON.stringify(data));
+
+    // Normalisasi Data: Memastikan NIM tersimpan di kunci 'nimMhs'
+    // meskipun API mengirimkan kunci yang berbeda (nim atau nim_mhs)
+    const normalizedData = {
+      ...data,
+      nimMhs: data.nimMhs || data.nim_mhs || data.nim,
+    };
+
+    setUserData(normalizedData);
+    await AsyncStorage.setItem("userData", JSON.stringify(normalizedData));
+
+    console.log("Data Berhasil Disimpan ke Context:", normalizedData);
   };
 
   const logout = async () => {

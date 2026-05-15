@@ -3,7 +3,6 @@ import { View, Text, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function DetailScreen({ route }) {
-  // Membongkar paket data yang dikirim dari HistoryScreen
   const { dataPresensi } = route.params;
 
   return (
@@ -32,12 +31,12 @@ export default function DetailScreen({ route }) {
 
         <View style={styles.row}>
           <Text style={styles.label}>Ruangan:</Text>
-          <Text style={styles.value}>{dataPresensi.room}</Text>
+          <Text style={styles.value}>{dataPresensi.ruangan}</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Dosen Pengampu:</Text>
-          <Text style={styles.value}>{dataPresensi.lecturer}</Text>
+          <Text style={styles.value}>{dataPresensi.dosenPengampu}</Text>
         </View>
       </View>
     </SafeAreaView>
