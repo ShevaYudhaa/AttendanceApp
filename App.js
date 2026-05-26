@@ -320,6 +320,7 @@ import HomeScreen from "./pages/HomeScreen";
 import HistoryScreen from "./pages/HistoryScreen";
 import DetailScreen from "./pages/DetailScreen";
 import AboutScreen from "./pages/AboutScreen";
+import LocationScreen from "./pages/LocationScreen";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -379,6 +380,17 @@ function AppTabs() {
           tabBarLabel: "Profil",
           tabBarIcon: ({ color }) => (
             <MaterialIcons name="person" size={24} color={color} />
+          ),
+        }}
+      />
+      {/* Tambahan Tab Maps di sini */}
+      <Tab.Screen
+        name="Location"
+        component={LocationScreen}
+        options={{
+          tabBarLabel: "Lokasi",
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons name="location-on" size={24} color={color} />
           ),
         }}
       />
