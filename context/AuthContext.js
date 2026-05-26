@@ -19,8 +19,6 @@ export const AuthProvider = ({ children }) => {
   const login = async (data) => {
     if (!data) return;
 
-    // Normalisasi Data: Memastikan NIM tersimpan di kunci 'nimMhs'
-    // meskipun API mengirimkan kunci yang berbeda (nim atau nim_mhs)
     const normalizedData = {
       ...data,
       nimMhs: data.nimMhs || data.nim_mhs || data.nim,
