@@ -13,7 +13,6 @@ import axios from "axios";
 
 // Sesuaikan dengan IP Address Komputer Anda
 const BASE_URL = "http://10.1.13.46:8080/api/presensi";
-w;
 
 export default function App() {
   const [loading, setLoading] = useState(true);
