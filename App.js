@@ -308,11 +308,12 @@
 // }
 
 import React, { useContext } from "react";
-import { Text } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { MaterialIcons } from "@expo/vector-icons";
+import { StatusBar } from "expo-status-bar";
+import { StyleSheet, View, Text, SafeAreaView } from "react-native";
 
 import { AuthProvider, AuthContext } from "./context/AuthContext";
 import LoginScreen from "./pages/LoginScreen";
@@ -321,6 +322,8 @@ import HistoryScreen from "./pages/HistoryScreen";
 import DetailScreen from "./pages/DetailScreen";
 import AboutScreen from "./pages/AboutScreen";
 import LocationScreen from "./pages/LocationScreen";
+
+import P9_2_NotificationScreen from "./pages/P9_2_Notification/NotificationScreen";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -425,10 +428,20 @@ function MainApp() {
 }
 
 // ================ ROOT ================
+// export default function App() {
+//   return (
+//     <AuthProvider>
+//       <MainApp />
+//     </AuthProvider>
+//   );
+// }
+
 export default function App() {
   return (
     <AuthProvider>
-      <MainApp />
+      <SafeAreaView style={{ flex: 1, backgroundColor: "#F0F4F8" }}>
+        <P9_2_NotificationScreen />
+      </SafeAreaView>
     </AuthProvider>
   );
 }
